@@ -14,3 +14,9 @@ Para gerar agua precisa de 2 molecolas de de hidrogenio e 1 de oxigenio
 cada molecola deve ser um processo em erlang
 
 Quando combinado deverá retornar quem foi combiado
+
+================================================================
+
+Todo:
+
+Realizar a ligação entre as moléculas

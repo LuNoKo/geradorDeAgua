@@ -1,17 +1,37 @@
 -module(start).
--export([start/1]).
+-export([start/1, correio/0, gerar_oxigenio/1, gerar_hidrogenio/1]).
 
-start(Interval) -> 
-  create_oxygen(Interval).
+start(Intervalo) -> 
+  gerador(Intervalo),
+  correio().
 
-create_oxygen(Interval) ->
-  Pid = spawn(fun(Interval) -> io:format("Fui criado oxygen. ~n", []), timer:sleep(Interval) end),
-  io:format("Criado um processo de oxigênio. ~w ~n", [Pid]).
-  % timer:sleep(Interval),
-  % create_hydrogen(Interval).
+correio() ->
+  receive 
+		{oxigenio, PidOx} -> io:format("CORREIO - oxigenio pronto com pid: ~w ~n", 
+      [PidOx]);
+		{hidrogenio, PidHi} -> io:format("CORREIO - hidrogenio pronto com pid: ~w ~n", 
+      [PidHi])
+	end,
+correio().
 
-% create_hydrogen(Interval) ->
-%   Pid = spawn(fun() -> io:format("Fui criado hydrigen. ~n", []) end),
-%   timer:sleep(Interval),
-%   io:format("Criado um processo de hidrogenio.~w ~n", [Pid]),
-%   create_oxygen(Interval).
+% Gerador de moleculas %
+gerador(Intervalo) ->
+  io:format("GERADOR - Iniciado ~n", []),
+  spawn(start, gerar_oxigenio, [self()]),
+  timer:sleep(Intervalo),
+  spawn(start, gerar_hidrogenio, [self()]).
+  gerador(Intervalo).
+
+gerar_oxigenio(PidCorreio) -> 
+  io:format("OXIGENIO - Gerado pid ~w ~n", [self()]),
+  Tempo = (rand:uniform(21) + 10) * 1000,
+  io:format("OXIGENIO - Tempo ~w ~n", [Tempo]),
+  timer:sleep(Tempo),
+  PidCorreio ! {oxigenio, self()}.
+
+gerar_hidrogenio(PidCorreio) -> 
+  io:format("HIDROGENIO - Gerado pid ~w ~n", [self()]),
+  Tempo = (rand:uniform(21) + 10) * 1000,
+  io:format("HIDROGENIO - Tempo ~w ~n", [Tempo]),
+  timer:sleep(Tempo),
+  PidCorreio ! {hidrogenio, self()}.
