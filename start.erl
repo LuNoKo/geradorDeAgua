@@ -25,13 +25,11 @@ gerador(Intervalo) ->
 gerar_oxigenio(PidCorreio) -> 
   io:format("OXIGENIO - Gerado pid ~w ~n", [self()]),
   Tempo = (rand:uniform(21) + 10) * 1000,
-  io:format("OXIGENIO - Tempo ~w ~n", [Tempo]),
   timer:sleep(Tempo),
   PidCorreio ! {oxigenio, self()}.
 
 gerar_hidrogenio(PidCorreio) -> 
   io:format("HIDROGENIO - Gerado pid ~w ~n", [self()]),
   Tempo = (rand:uniform(21) + 10) * 1000,
-  io:format("HIDROGENIO - Tempo ~w ~n", [Tempo]),
   timer:sleep(Tempo),
   PidCorreio ! {hidrogenio, self()}.
