@@ -31,4 +31,5 @@ Quando combinado deverá retornar quem foi combiado
 
 Todo:
 
-Realizar a ligação entre as moléculas
+Esta funcionando, mas o sistema realiza a geração das 3 moleculas e aguarda pra fazer a ligação de todas.
+Após fazer a agua, ai sim ele realiza a geração de 2 hidrogenios e 1 oxigenio.

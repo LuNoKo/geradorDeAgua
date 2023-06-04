@@ -1,18 +1,27 @@
 -module(start).
--export([start/0, correioStart/0, correioLigacoes/3, gerar_oxigenio/1, gerar_hidrogenio/1, gerador/1]).
+-export([start/0, correioLigacoes/3, gerar_oxigenio/1, gerar_hidrogenio/1]).
 
 start() -> 
-  gerador(3000),
-  correioStart().
+  % correioStart(),
+  % gerador(3000, 1).
+  Intervalo = 3000,
 
-% Gerador de moleculas %
-gerador(Intervalo) ->
-  io:format("GERADOR - Iniciado ~n", []),
   timer:sleep(Intervalo),
   spawn(start, gerar_oxigenio, [self()]),
   timer:sleep(Intervalo),
   spawn(start, gerar_hidrogenio, [self()]),
-  gerador(Intervalo).
+  timer:sleep(Intervalo),
+  spawn(start, gerar_hidrogenio, [self()]),
+
+  receive 
+		{oxigenio, PidOx} -> 
+      io:format("CORREIO - oxigenio pronto com pid: ~w ~n", [PidOx]),
+      correioLigacoes(nada, nada, {oxigenio, PidOx});
+		{hidrogenio, PidHi} -> 
+      io:format("CORREIO - hidrogenio pronto com pid: ~w ~n", [PidHi]),
+      correioLigacoes({hidrogenio, PidHi}, nada, nada)
+	end,
+  start().
 
 gerar_oxigenio(PidCorreio) -> 
   io:format("OXIGENIO - Gerado pid ~w ~n", [self()]),
@@ -25,18 +34,6 @@ gerar_hidrogenio(PidCorreio) ->
   Tempo = (rand:uniform(21) + 10) * 1000,
   timer:sleep(Tempo),
   PidCorreio ! {hidrogenio, self()}.
-
-correioStart() ->
-  receive 
-		{oxigenio, PidOx} -> 
-      %io:format("CORREIO - oxigenio pronto com pid: ~w ~n", [PidOx]),
-      correioLigacoes({oxigenio, PidOx}, nada, nada);
-		{hidrogenio, PidHi} -> 
-      %io:format("CORREIO - hidrogenio pronto com pid: ~w ~n", [PidHi]),
-      correioLigacoes({hidrogenio, PidHi}, nada, nada)
-	end.
-
-
 
 
 % correioLigacoes() -> % HHO
@@ -59,9 +56,10 @@ correioLigacoes({hidrogenio, PidHiParam1}, {hidrogenio, PidHiParam2}, {oxigenio,
 
 %=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-correioLigacoes({hidrogenio, PidHiParam1}, {hidrogenio, PidHiParam2}, nada) ->
+correioLigacoes({hidrogenio, PidHiParam1}, {hidrogenio, PidHiParam2}, nada) -> %HH_
   receive 
 		{oxigenio, PidOx} -> 
+      io:format("CORREIO HH_ - oxigenio pronto com pid: ~w ~n", [PidOx]),
       correioLigacoes({hidrogenio, PidHiParam1}, {hidrogenio, PidHiParam2}, {oxigenio, PidOx})
 		% {hidrogenio, PidHi} -> 
     %   correioLigacoes({hidrogenio, PidHiParam}, {hidrogenio, PidHi} , {oxigenio, PidOxParam})
@@ -69,11 +67,12 @@ correioLigacoes({hidrogenio, PidHiParam1}, {hidrogenio, PidHiParam2}, nada) ->
 
 %=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-correioLigacoes({hidrogenio, PidHiParam}, nada , {oxigenio, PidOxParam}) -> % HO_
+correioLigacoes({hidrogenio, PidHiParam}, nada , {oxigenio, PidOxParam}) -> % H_O
   receive 
 		% {oxigenio, PidOx} -> 
     %   correioLigacoes({oxigenio, PidOx});
 		{hidrogenio, PidHi} -> 
+      io:format("CORREIO H_O- hidrogenio pronto com pid: ~w ~n", [PidHi]),
       correioLigacoes({hidrogenio, PidHiParam}, {hidrogenio, PidHi} , {oxigenio, PidOxParam})
 	end;
 
@@ -82,17 +81,20 @@ correioLigacoes({hidrogenio, PidHiParam}, nada , {oxigenio, PidOxParam}) -> % HO
 correioLigacoes({hidrogenio, PidHiParam}, nada, nada) -> % H__
   receive 
 		{oxigenio, PidOx} -> 
+      io:format("CORREIO H__ - oxigenio pronto com pid: ~w ~n", [PidOx]),
       correioLigacoes({hidrogenio, PidHiParam}, nada, {oxigenio, PidOx});
-		{hidrogenio, PidHi} -> 
+		{hidrogenio, PidHi} ->
+      io:format("CORREIO H__ - hidrogenio pronto com pid: ~w ~n", [PidHi]),
       correioLigacoes({hidrogenio, PidHiParam}, {hidrogenio, PidHi}, nada)
 	end;
 
 %=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-correioLigacoes({oxigenio, PidOXParam}, nada, nada) -> % O__
+correioLigacoes(nada, nada, {oxigenio, PidOXParam}) -> % __O
   receive 
 		% {oxigenio, PidOx} -> 
     %   correioLigacoes({oxigenio, PidOx}, {PidParamOX});
 		{hidrogenio, PidHi} -> 
+      io:format("CORREIO O__ - hidrogenio pronto com pid: ~w ~n", [PidHi]),
       correioLigacoes({hidrogenio, PidHi}, nada ,{oxigenio, PidOXParam})
 	end.
