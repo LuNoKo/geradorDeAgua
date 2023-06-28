@@ -20,6 +20,8 @@ Com base na descrição apresentada, desenvolva uma aplicação em Erlang que si
 - Cada processo deve ser identificado unicamente e apresentar uma mensagem quando criado informando esta identificação;
 - A aplicação deve identificar as combinações realizadas, apresentando a identificação dos elementos combinados;
 
+Referência: Andrews, G. R. (1991). Concurrent programming: principles and practice. San Francisco: Benjamin/Cummings Publishing Company.
+
 ---
 
 ## Execução do projeto
